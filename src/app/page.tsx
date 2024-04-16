@@ -4,8 +4,8 @@ import { embedDashboard } from "@superset-ui/embedded-sdk";
 import { useCallback, useEffect, useRef, useState, FormEvent } from "react";
 
 const SUPERSET_DOMAIN = process.env.SUPERSET_DOMAIN || ''
-const DASHBOARD_ID = '2a85acb4-ca06-4f37-a959-bdc2359ca627'
-const CUSTOMER_ID = '2a85acb4-ca06-4f37-a959-bdc2359ca627'
+const DEFAULT_DASHBOARD_ID = process.env.DEFAULT_DASHBOARD_ID || ''
+const DEFAULT_CUSTOMER_ID = process.env.DEFAULT_CUSTOMER_ID || ''
 
 interface DashboardParams {
   dashboardId: string;
@@ -65,20 +65,16 @@ export default function Home() {
       },
     });
   }, [elementRef, dashboardParams])
-
-  useEffect(() => onDashboardReload(), [onDashboardReload])
   
+  // Init
   useEffect(() => {
-    if (dashboardIdRef?.current && !dashboardIdRef?.current?.value) {
-      dashboardIdRef.current.value = DASHBOARD_ID
-    }
-  }, [dashboardIdRef])
+    if (!dashboardIdRef?.current || !customerIdRef?.current) return;
+    
+    dashboardIdRef.current.value = DEFAULT_DASHBOARD_ID
+    customerIdRef.current.value = DEFAULT_CUSTOMER_ID
 
-  useEffect(() => {
-    if (customerIdRef?.current && !customerIdRef?.current?.value) {
-      customerIdRef.current.value = CUSTOMER_ID
-    }
-  }, [customerIdRef])
+    onDashboardReload()
+  }, [onDashboardReload, dashboardIdRef, customerIdRef])
 
   return (
     <main className="flex h-screen flex-col">
