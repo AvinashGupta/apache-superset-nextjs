@@ -9,7 +9,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const { dashboardId } = req.query
+  const { dashboardId, userId } = req.query
 
   try {
     // Superset Login
@@ -54,7 +54,11 @@ export default async function handler(
             "type": "dashboard"
           }
         ],
-        "rls": [],
+        "rls": [
+          {
+            "clause": `user_id='${userId}'`
+          }
+        ],
         "user": {
           "first_name": "guest",
           "last_name": "guest",

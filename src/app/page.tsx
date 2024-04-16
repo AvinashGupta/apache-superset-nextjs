@@ -1,19 +1,24 @@
 'use client'
 
+import UseListUsers from "@/hooks/UseListUsers";
 import { embedDashboard } from "@superset-ui/embedded-sdk";
-import { useCallback, useEffect, useRef, useState, FormEvent } from "react";
+import { useCallback, useEffect, useRef, useState, FormEvent, use } from "react";
 
 const SUPERSET_DOMAIN = process.env.SUPERSET_DOMAIN || ''
 const DEFAULT_DASHBOARD_ID = process.env.DEFAULT_DASHBOARD_ID || ''
-const DEFAULT_CUSTOMER_ID = process.env.DEFAULT_CUSTOMER_ID || ''
 
 interface DashboardParams {
   dashboardId: string;
-  customerId: string;
+  companyName: string;
+  userId: string;
 }
 
-async function fetchGuestTokenFromBackend(dashboardId: string) {
-  const loginRes = await fetch(`${location.href}/api/guestToken?dashboardId=${dashboardId}`, {
+async function fetchGuestTokenFromBackend({
+  dashboardId,
+  userId
+}: DashboardParams) {
+  const url = `${location.href}/api/guestToken?dashboardId=${dashboardId}&userId=${userId}`
+  const loginRes = await fetch(url, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -26,11 +31,15 @@ async function fetchGuestTokenFromBackend(dashboardId: string) {
 export default function Home() {
   const elementRef = useRef<HTMLDivElement>(null)
   const dashboardIdRef = useRef<HTMLInputElement>(null)
-  const customerIdRef = useRef<HTMLInputElement>(null)
+  const companyNameRef = useRef<HTMLInputElement>(null)
+  const userIdRef = useRef<HTMLSelectElement>(null)
   const [dashboardParams, setDashboardParams] = useState<DashboardParams>({
     dashboardId: '',
-    customerId: ''
+    companyName: '',
+    userId: ''
   })
+  
+  const {users, loading } = UseListUsers();
   
   const onDashboardReload = useCallback((event?: FormEvent) => {
     event?.preventDefault();
@@ -38,18 +47,23 @@ export default function Home() {
     setDashboardParams((prev) => ({
       ...prev,
       dashboardId: dashboardIdRef.current?.value || '',
-      customerId: customerIdRef.current?.value || ''
+      companyName: companyNameRef.current?.value || '',
+      userId: userIdRef.current?.value || '',
     }))
-  }, [dashboardIdRef, customerIdRef])
+  }, [dashboardIdRef, companyNameRef])
 
   useEffect(() => {
-    if (!elementRef.current || !dashboardParams.dashboardId) return;
+    if (
+      !elementRef.current ||
+      !dashboardParams.dashboardId ||
+      !dashboardParams.userId
+    ) return;
 
     embedDashboard({
       id: dashboardParams.dashboardId,
       supersetDomain: SUPERSET_DOMAIN,
       mountPoint: elementRef.current,
-      fetchGuestToken: () => fetchGuestTokenFromBackend(dashboardParams.dashboardId),
+      fetchGuestToken: () => fetchGuestTokenFromBackend(dashboardParams),
       dashboardUiConfig: {
         hideTitle: true,
         hideChartControls: true,
@@ -68,13 +82,17 @@ export default function Home() {
   
   // Init
   useEffect(() => {
-    if (!dashboardIdRef?.current || !customerIdRef?.current) return;
+    if (
+      !dashboardIdRef?.current ||
+      !userIdRef?.current ||
+      !users.length
+    ) return;
     
     dashboardIdRef.current.value = DEFAULT_DASHBOARD_ID
-    customerIdRef.current.value = DEFAULT_CUSTOMER_ID
+    userIdRef.current.value = users[0].id
 
     onDashboardReload()
-  }, [onDashboardReload, dashboardIdRef, customerIdRef])
+  }, [onDashboardReload, dashboardIdRef, users])
 
   return (
     <main className="flex h-screen flex-col">
@@ -82,9 +100,9 @@ export default function Home() {
         <div className="flex flex-wrap w-full">
           <form className="w-full" onSubmit={onDashboardReload}>
             <div className="grid grid-cols-4 md:grid-cols-12 gap-3">
-              <div className="flex items-center col-span-8">
-                <div className="grid grid-cols-4 md:grid-cols-8 gap-3">
-                  <div className="flex items-center">
+              <div className="flex items-center col-span-10">
+                <div className="grid grid-cols-4 md:grid-cols-12 gap-3">
+                  <div className="flex items-center justify-end">
                     <label
                       className="font-bold mb-1 md:mb-0 whitespace-nowrap mr-1"
                       htmlFor="dashboard-id"
@@ -99,24 +117,43 @@ export default function Home() {
                       placeholder="dashboard id.."
                     />
                   </div>
-                  <div className="flex items-center">
+                  <div className="flex items-center justify-end">
                     <label
-                      className="block font-bold mb-1 md:mb-0 whitespace-nowrap mr-1"
-                      htmlFor="customer-id"
-                    >Customer Id</label>
+                      className="block font-bold mb-1 md:mb-0 whitespace-nowrap mr-0"
+                      htmlFor="user-id"
+                    >User Id</label>
+                  </div>
+                  <div className="flex items-center col-span-3">
+                    <select
+                      ref={userIdRef}
+                      id="user-id"
+                      defaultValue={''}
+                      className="bg-gray-50 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                    >
+                      <option value={''}>Select a user</option>
+                      {users.map((user, i) => (
+                        <option
+                          selected={i==0}
+                          key={user.id}
+                          value={user.id}
+                        >
+                          {user.first_name} {user.last_name} - {user.email}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                   <div className="flex items-center col-span-3">
                     <input
-                      ref={customerIdRef}
+                      ref={companyNameRef}
                       type="text"
-                      id="customer-id"
+                      id="company-name"
                       className="text-sm rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                      placeholder="customer id.."
+                      placeholder="company name.."
                     />
                   </div>
                 </div>
               </div>
-              <div className="flex items-right col-span-4 flex-row-reverse">
+              <div className="flex items-right col-span-2 flex-row-reverse">
                 <button
                   type="submit"
                   className="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded"

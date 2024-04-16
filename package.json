@@ -10,7 +10,6 @@
   },
   "dependencies": {
     "@superset-ui/embedded-sdk": "^0.1.0-alpha.11",
-    "axios": "^1.6.8",
     "next": "14.2.1",
     "react": "^18",
     "react-dom": "^18"
