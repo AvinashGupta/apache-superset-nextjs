@@ -3,11 +3,7 @@ import fs from 'fs';
 import path from 'path';
 
 type Data = {
-  id: string;
-  email: string;
-  roles: string[];
-  first_name: string;
-  last_name: string;
+  [key: string]: any;
 };
 
 export default function handler(
