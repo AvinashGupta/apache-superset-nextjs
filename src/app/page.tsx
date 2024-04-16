@@ -156,7 +156,8 @@ export default function Home() {
               <div className="flex items-right col-span-2 flex-row-reverse">
                 <button
                   type="submit"
-                  className="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded"
+                  disabled={loading || !userIdRef?.current?.value || !dashboardIdRef?.current?.value}
+                  className="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded disabled:bg-slate-300"
                 >
                   Reload Dashboard
                 </button>
