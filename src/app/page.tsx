@@ -13,7 +13,7 @@ interface DashboardParams {
 }
 
 async function fetchGuestTokenFromBackend(dashboardId: string) {
-  const loginRes = await fetch(`/api/guestToken?dashboardId=${dashboardId}`, {
+  const loginRes = await fetch(`${location.href}/api/guestToken?dashboardId=${dashboardId}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
