@@ -101,25 +101,25 @@ export default function Home() {
           <form className="w-full" onSubmit={onDashboardReload}>
             <div className="grid grid-cols-4 md:grid-cols-12 gap-3">
               <div className="flex items-center col-span-10">
-                <div className="grid grid-cols-4 md:grid-cols-12 gap-3">
+                <div className="grid grid-cols-4 md:grid-cols-12 gap-3 w-full">
                   <div className="flex items-center justify-end">
                     <label
-                      className="font-bold mb-1 md:mb-0 whitespace-nowrap mr-1"
+                      className="font-bold mb-1 md:mb-0 whitespace-nowrap mr-0 text-sm"
                       htmlFor="dashboard-id"
-                    >Dashboard Id</label>
+                    >Dashboard</label>
                   </div>
                   <div className="flex items-center col-span-3">
                     <input
                       ref={dashboardIdRef}
                       type="text"
                       id="dashboard-id"
-                      className="text-sm rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                      className="text-sm rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 block w-full p-2"
                       placeholder="dashboard id.."
                     />
                   </div>
                   <div className="flex items-center justify-end">
                     <label
-                      className="block font-bold mb-1 md:mb-0 whitespace-nowrap mr-0"
+                      className="block font-bold mb-1 md:mb-0 whitespace-nowrap mr-0 text-sm"
                       htmlFor="user-id"
                     >User Id</label>
                   </div>
@@ -128,7 +128,7 @@ export default function Home() {
                       ref={userIdRef}
                       id="user-id"
                       defaultValue={''}
-                      className="bg-gray-50 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                      className="text-sm bg-gray-50 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2"
                     >
                       <option value={''}>Select a user</option>
                       {users.map((user, i) => (
@@ -147,7 +147,7 @@ export default function Home() {
                       ref={companyNameRef}
                       type="text"
                       id="company-name"
-                      className="text-sm rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                      className="text-sm rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 block w-full p-2"
                       placeholder="company name.."
                     />
                   </div>
@@ -157,7 +157,7 @@ export default function Home() {
                 <button
                   type="submit"
                   disabled={loading || !userIdRef?.current?.value || !dashboardIdRef?.current?.value}
-                  className="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded disabled:bg-slate-300"
+                  className="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded disabled:bg-slate-300 text-sm"
                 >
                   Reload Dashboard
                 </button>
